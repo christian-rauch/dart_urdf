@@ -9,6 +9,7 @@ add_definitions(-std=c++11)
 find_package(urdfdom REQUIRED)          # reading URDF models
 find_package(CUDA REQUIRED)             # CUDA types used by DART
 find_package(Boost REQUIRED filesystem) # traversing paths to find meshes
+find_package(Doxygen)
 
 set( ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${DART_INSTALL_ROOT}/lib/pkgconfig" )
 
@@ -20,6 +21,15 @@ if(NOT dart_FOUND)
         "You can specify the path to your DART installation by cmake variable DART_INSTALL_ROOT, "
         "e.g. 'cmake -DDART_INSTALL_ROOT=/path/to/dart/install/dir ..'"
         )
+endif()
+
+if(DOXYGEN_FOUND)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    add_custom_target(doc
+    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
 endif()
 
 
