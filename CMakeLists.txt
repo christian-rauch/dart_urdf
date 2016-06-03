@@ -59,3 +59,18 @@ target_link_libraries(dart_urdf ${Boost_LIBRARIES})
 ## install
 install(TARGETS dart_urdf LIBRARY DESTINATION lib)  # shared library
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
+
+# setup pkg-config files
+SET(PKG_CONFIG_REQUIRES "dart urdfdom")
+SET(PKG_CONFIG_LIBDIR       "\${prefix}/lib" )
+SET(PKG_CONFIG_INCLUDEDIR   "\${prefix}/include" )
+SET(PKG_CONFIG_LIBS         "-L\${libdir} -ldart_urdf" )
+SET(PKG_CONFIG_CFLAGS       "-I\${includedir}" )
+
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/pkg-config.pc.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/dart_urdf.pc"
+)
+
+INSTALL(FILES "${CMAKE_BINARY_DIR}/dart_urdf.pc"
+        DESTINATION lib/pkgconfig)
