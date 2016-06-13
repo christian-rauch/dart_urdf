@@ -5,6 +5,8 @@ project(dart_urdf)
 # enable C++ 11
 add_definitions(-std=c++11)
 
+add_definitions ("-Wall")
+
 ## find dependendies
 find_package(urdfdom REQUIRED)          # reading URDF models
 find_package(CUDA REQUIRED)             # CUDA types used by DART
