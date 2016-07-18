@@ -41,7 +41,7 @@ include_directories(${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc)
 include_directories(${dart_INCLUDE_DIRS})
 # TODO: we need to add "dart" subdirectory because dart's header files use absolute paths
 # e.g. it is using '#include "model/model.h"' instead of '#include <dart/model/model.h>'
-include_directories(${dart_INCLUDE_DIRS}/dart)
+include_directories(${dart_INCLUDEDIR}/dart)
 
 include_directories(${urdfdom_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
