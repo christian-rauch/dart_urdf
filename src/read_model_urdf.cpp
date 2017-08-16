@@ -4,9 +4,12 @@
 // urdf parser and model
 #include <urdf_parser/urdf_parser.h>
 
-// boost for parsing file paths
+#ifdef ROS_RESOURCE
+    #include <ros/package.h>
+#else
+    #include <boost/algorithm/string/replace.hpp>
+#endif
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string/replace.hpp>
 
 // constants for determining and replacing the package path in URDF mesh paths
 #define PACKAGE_PATH_FILE "package.xml"
@@ -161,9 +164,24 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
             sx = std::to_string(scale.x);
             sy = std::to_string(scale.y);
             sz = std::to_string(scale.z);
+
             if(mesh_path.find(PACKAGE_PATH_URI_SCHEME) != std::string::npos) {
+#ifdef ROS_RESOURCE
+                mesh_path.erase(0, strlen(PACKAGE_PATH_URI_SCHEME));
+                const size_t pos = mesh_path.find("/");
+                const std::string package_name = mesh_path.substr(0, pos);
+                mesh_path.erase(0, pos);
+                const std::string package_path = ros::package::getPath(package_name);
+
+                if (package_path.empty()) {
+                    throw std::runtime_error("Package [" + package_name + "] does not exist");
+                }
+
+                mesh_path = package_path + mesh_path;
+#else
                 // we need to replace "package://" by full path
                 boost::algorithm::replace_first(mesh_path, PACKAGE_PATH_URI_SCHEME, conf.package_path);
+#endif
             }
             else {
                 // prepend full path
@@ -173,6 +191,7 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
                 mesh_path = boost::filesystem::path(mesh_path).
                         replace_extension(conf.mesh_extension_surrogate).native();
             }
+
 #ifdef PRNT_DBG
             std::cout<<"loading mesh from: "<<mesh_path<<std::endl;
 #endif
@@ -301,14 +320,13 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
 /**
  * @brief readModelURDF readModelURDF parse URDF model description and store kinematic and meshes in DART model format
  */
-bool readModelURDF(const std::string &path, HostOnlyModel &model,
+bool readModelURDF(const ModelInterfaceConstPtr urdf_model,
+                   const std::string &path,
+                   HostOnlyModel &model,
                    const std::string &root_link_name,
                    const std::string &mesh_extension_surrogate,
                    const std::vector<uint8_t> &colour)
 {
-    // parse URDF file
-    ModelInterfaceConstPtr urdf_model = urdf::parseURDFFile(path);
-
     // get robot name
     std::cout<<"found URDF robot: "<<urdf_model->getName()<<std::endl;
     model.setName(urdf_model->getName());
@@ -327,6 +345,7 @@ bool readModelURDF(const std::string &path, HostOnlyModel &model,
 
         conf.colour = colour;
 
+#ifndef ROS_RESOURCE
         // get full absolute path
         boost::filesystem::path fpath = boost::filesystem::canonical(path);
 
@@ -346,6 +365,7 @@ bool readModelURDF(const std::string &path, HostOnlyModel &model,
             conf.package_path = fpath.branch_path().native() + boost::filesystem::path::preferred_separator;
         }
         std::cout<<"URDF package path: "<<conf.package_path<<std::endl;
+#endif
 
         conf.mesh_extension_surrogate = mesh_extension_surrogate;
 
@@ -358,10 +378,45 @@ bool readModelURDF(const std::string &path, HostOnlyModel &model,
     }
 }
 
-const HostOnlyModel &readModelURDF(const std::string &path, const std::string &root_link_name, const std::string &mesh_extension_surrogate, const std::vector<uint8_t> &colour)
+bool readModelURDF(const std::string &path,
+                   HostOnlyModel &model,
+                   const std::string &root_link_name,
+                   const std::string &mesh_extension_surrogate,
+                   const std::vector<uint8_t> &colour)
+{
+    // parse URDF file
+    const ModelInterfaceConstPtr urdf_model = urdf::parseURDFFile(path);
+    return readModelURDF(urdf_model, path, model, root_link_name, mesh_extension_surrogate, colour);
+}
+
+bool readModelURDFxml(const std::string &xml_string,
+                   HostOnlyModel &model,
+                   const std::string &root_link_name,
+                   const std::string &mesh_extension_surrogate,
+                   const std::vector<uint8_t> &colour)
+{
+    // parse URDF string
+    ModelInterfaceConstPtr urdf_model = urdf::parseURDF(xml_string);
+    return readModelURDF(urdf_model, "", model, root_link_name, mesh_extension_surrogate, colour);
+}
+
+const HostOnlyModel &readModelURDF(const std::string &path,
+                                   const std::string &root_link_name,
+                                   const std::string &mesh_extension_surrogate,
+                                   const std::vector<uint8_t> &colour)
 {
     HostOnlyModel *model = new HostOnlyModel();
     readModelURDF(path, *model, root_link_name, mesh_extension_surrogate, colour);
+    return *model;
+}
+
+const HostOnlyModel &readModelURDFxml(const std::string &xml_string,
+                                      const std::string &root_link_name,
+                                      const std::string &mesh_extension_surrogate,
+                                      const std::vector<uint8_t> &colour)
+{
+    HostOnlyModel *model = new HostOnlyModel();
+    readModelURDFxml(xml_string, *model, root_link_name, mesh_extension_surrogate, colour);
     return *model;
 }
 

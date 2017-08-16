@@ -9,7 +9,7 @@ add_definitions ("-Wall")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED dart)
+find_package(catkin REQUIRED dart roslib)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -17,6 +17,12 @@ find_package(urdfdom REQUIRED)          # reading URDF models
 find_package(CUDA REQUIRED)             # CUDA types used by DART
 find_package(Boost REQUIRED filesystem) # traversing paths to find meshes
 find_package(Doxygen)
+
+# check for ROS
+find_package(roslib QUIET)
+if(roslib_FOUND)
+    add_definitions(-DROS_RESOURCE)
+endif()
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
