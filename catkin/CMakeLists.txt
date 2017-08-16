@@ -107,7 +107,7 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES dart_urdf
     CATKIN_DEPENDS dart
-    DEPENDS urdfdom
+    DEPENDS urdfdom boost
 )
 
 ###########
@@ -155,6 +155,7 @@ add_library(dart_urdf ../src/read_model_urdf.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(dart_urdf ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 #############
 ## Install ##
