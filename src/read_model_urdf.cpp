@@ -193,16 +193,21 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
         }
 
         // colour
-        if(conf.colour.size()!=0 || link->visual->material==NULL ) {
+        if(conf.colour.size()!=0) {
             r = conf.colour[0];
             g = conf.colour[1];
             b = conf.colour[2];
         }
-        else {
+        else if(link->visual->material!=NULL){
             urdf::Color colour = link->visual->material->color;
             r = colour.r*255;
             g = colour.g*255;
             b = colour.b*255;
+        }
+        else {
+            r = 127;
+            g = 127;
+            b = 127;
         }
 
         model.addGeometry(parent_id, geom_type,
