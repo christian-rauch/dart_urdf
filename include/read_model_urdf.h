@@ -14,7 +14,7 @@ namespace dart {
  * @return true on success
  * @return false on failure
  */
-bool readModelURDF(const std::string &path, HostOnlyModel & model, const std::string &root_link_name = "", const std::string &mesh_extension_surrogate = "", const std::vector<uint8_t> &colour = {127, 127, 127});
+bool readModelURDF(const std::string &path, HostOnlyModel & model, const std::string &root_link_name = "", const std::vector<uint8_t> &colour = {});
 
 /**
  * @brief readModelURDFxml parse URDF model description and store kinematic and meshes in DART model format
@@ -25,7 +25,7 @@ bool readModelURDF(const std::string &path, HostOnlyModel & model, const std::st
  * @return true on success
  * @return false on failure
  */
-bool readModelURDFxml(const std::string &xml_string, HostOnlyModel & model, const std::string &root_link_name = "", const std::string &mesh_extension_surrogate = "", const std::vector<uint8_t> &colour = {127, 127, 127});
+bool readModelURDFxml(const std::string &xml_string, HostOnlyModel & model, const std::string &root_link_name = "", const std::vector<uint8_t> &colour = {});
 
 /**
  * @brief readModelURDF parse URDF model description and store kinematic and meshes in DART model format
@@ -34,7 +34,7 @@ bool readModelURDFxml(const std::string &xml_string, HostOnlyModel & model, cons
  * @param mesh_extension_surrogate optional file extension to load meshes from different file types as provided in the URDF model description
  * @return instance of Dart model with frames imported from URDF model description
  */
-const HostOnlyModel &readModelURDF(const std::string &path, const std::string &root_link_name = "", const std::string &mesh_extension_surrogate = "", const std::vector<uint8_t> &colour = {127, 127, 127});
+const HostOnlyModel &readModelURDF(const std::string &path, const std::string &root_link_name = "", const std::vector<uint8_t> &colour = {});
 
 /**
  * @brief readModelURDF parse URDF model description and store kinematic and meshes in DART model format
@@ -43,7 +43,7 @@ const HostOnlyModel &readModelURDF(const std::string &path, const std::string &r
  * @param mesh_extension_surrogate optional file extension to load meshes from different file types as provided in the URDF model description
  * @return instance of Dart model with frames imported from URDF model description
  */
-const HostOnlyModel &readModelURDFxml(const std::string &xml_string, const std::string &root_link_name = "", const std::string &mesh_extension_surrogate = "", const std::vector<uint8_t> &colour = {127, 127, 127});
+const HostOnlyModel &readModelURDFxml(const std::string &xml_string, const std::string &root_link_name = "", const std::vector<uint8_t> &colour = {});
 
 } // namespace dart
 

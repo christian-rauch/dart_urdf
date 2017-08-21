@@ -41,11 +41,6 @@ struct MeshLoaderConfig {
     std::string package_path;
 
     /**
-     * @brief mesh_extension_surrogate optionally replace mesh file extension
-     */
-    std::string mesh_extension_surrogate;
-
-    /**
      * @brief colour RGB colour definition for untextured meshes
      */
     std::vector<uint8_t> colour;
@@ -187,10 +182,6 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
                 // prepend full path
                 mesh_path = conf.package_path + mesh_path;
             }
-            if(!conf.mesh_extension_surrogate.empty()) {
-                mesh_path = boost::filesystem::path(mesh_path).
-                        replace_extension(conf.mesh_extension_surrogate).native();
-            }
 
 #ifdef PRNT_DBG
             std::cout<<"loading mesh from: "<<mesh_path<<std::endl;
@@ -202,17 +193,16 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
         }
 
         // colour
-        if(link->visual->material!=NULL) {
+        if(conf.colour.size()!=0 || link->visual->material==NULL ) {
+            r = conf.colour[0];
+            g = conf.colour[1];
+            b = conf.colour[2];
+        }
+        else {
             urdf::Color colour = link->visual->material->color;
             r = colour.r*255;
             g = colour.g*255;
             b = colour.b*255;
-        }
-        else {
-            // use default values
-            r = conf.colour[0];
-            g = conf.colour[1];
-            b = conf.colour[2];
         }
 
         model.addGeometry(parent_id, geom_type,
@@ -324,7 +314,6 @@ bool readModelURDF(const ModelInterfaceConstPtr urdf_model,
                    const std::string &path,
                    HostOnlyModel &model,
                    const std::string &root_link_name,
-                   const std::string &mesh_extension_surrogate,
                    const std::vector<uint8_t> &colour)
 {
     // get robot name
@@ -367,8 +356,6 @@ bool readModelURDF(const ModelInterfaceConstPtr urdf_model,
         std::cout<<"URDF package path: "<<conf.package_path<<std::endl;
 #endif
 
-        conf.mesh_extension_surrogate = mesh_extension_surrogate;
-
         // extract links and joints recursively
         return extract_frames(0, l_root, urdf_model, model, conf);
     }
@@ -381,42 +368,38 @@ bool readModelURDF(const ModelInterfaceConstPtr urdf_model,
 bool readModelURDF(const std::string &path,
                    HostOnlyModel &model,
                    const std::string &root_link_name,
-                   const std::string &mesh_extension_surrogate,
                    const std::vector<uint8_t> &colour)
 {
     // parse URDF file
     const ModelInterfaceConstPtr urdf_model = urdf::parseURDFFile(path);
-    return readModelURDF(urdf_model, path, model, root_link_name, mesh_extension_surrogate, colour);
+    return readModelURDF(urdf_model, path, model, root_link_name, colour);
 }
 
 bool readModelURDFxml(const std::string &xml_string,
                    HostOnlyModel &model,
                    const std::string &root_link_name,
-                   const std::string &mesh_extension_surrogate,
                    const std::vector<uint8_t> &colour)
 {
     // parse URDF string
     ModelInterfaceConstPtr urdf_model = urdf::parseURDF(xml_string);
-    return readModelURDF(urdf_model, "", model, root_link_name, mesh_extension_surrogate, colour);
+    return readModelURDF(urdf_model, "", model, root_link_name, colour);
 }
 
 const HostOnlyModel &readModelURDF(const std::string &path,
                                    const std::string &root_link_name,
-                                   const std::string &mesh_extension_surrogate,
                                    const std::vector<uint8_t> &colour)
 {
     HostOnlyModel *model = new HostOnlyModel();
-    readModelURDF(path, *model, root_link_name, mesh_extension_surrogate, colour);
+    readModelURDF(path, *model, root_link_name, colour);
     return *model;
 }
 
 const HostOnlyModel &readModelURDFxml(const std::string &xml_string,
                                       const std::string &root_link_name,
-                                      const std::string &mesh_extension_surrogate,
                                       const std::vector<uint8_t> &colour)
 {
     HostOnlyModel *model = new HostOnlyModel();
-    readModelURDFxml(xml_string, *model, root_link_name, mesh_extension_surrogate, colour);
+    readModelURDFxml(xml_string, *model, root_link_name, colour);
     return *model;
 }
 
