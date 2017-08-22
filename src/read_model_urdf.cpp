@@ -302,6 +302,7 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
         const int child_id =
             model.addFrame(parent_id, type, posX, posY, posZ, oriX, oriY, oriZ,
                            axisX, axisY, axisZ, min, max, name);
+        model.addFrameName(j->child_link_name);
 
         // follow edges
         LinkConstPtr l_child = urdf_model->getLink(j->child_link_name);
@@ -362,6 +363,7 @@ bool readModelURDF(const ModelInterfaceConstPtr urdf_model,
 #endif
 
         // extract links and joints recursively
+        model.addFrameName(l_root->name);
         return extract_frames(0, l_root, urdf_model, model, conf);
     }
     else {
