@@ -113,7 +113,7 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES dart_urdf
     CATKIN_DEPENDS dart
-    DEPENDS urdfdom boost
+    DEPENDS urdfdom Boost
 )
 
 ###########
