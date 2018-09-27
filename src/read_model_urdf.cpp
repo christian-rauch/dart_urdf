@@ -20,15 +20,15 @@
 namespace dart {
 
 /// type definitions for shared pointers
-typedef const boost::shared_ptr< const urdf::ModelInterface> ModelInterfaceConstPtr;
+typedef const std::shared_ptr< const urdf::ModelInterface> ModelInterfaceConstPtr;
 
-typedef boost::shared_ptr< urdf::Link > LinkPtr;
-typedef boost::shared_ptr< const urdf::Link > LinkConstPtr;
-typedef boost::shared_ptr< urdf::Joint > JointPtr;
-typedef boost::shared_ptr< const urdf::Joint > JointConstPtr;
+typedef std::shared_ptr< urdf::Link > LinkPtr;
+typedef std::shared_ptr< const urdf::Link > LinkConstPtr;
+typedef std::shared_ptr< urdf::Joint > JointPtr;
+typedef std::shared_ptr< const urdf::Joint > JointConstPtr;
 
-typedef std::vector< boost::shared_ptr< urdf::Link > > LinkPtrVec;
-typedef std::vector< boost::shared_ptr< urdf::Joint > > JointPtrVec;
+typedef std::vector< std::shared_ptr< urdf::Link > > LinkPtrVec;
+typedef std::vector< std::shared_ptr< urdf::Joint > > JointPtrVec;
 
 /**
  * @brief The MeshLoaderConfig struct
@@ -97,7 +97,7 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
     /// get geometric volume
 
     if(link->visual != NULL) {
-        boost::shared_ptr< urdf::Geometry > geometry = link->visual->geometry;
+        std::shared_ptr< urdf::Geometry > geometry = link->visual->geometry;
 
         dart::GeomType geom_type;
         std::string sx, sy, sz; // scale
@@ -277,7 +277,7 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
         // limits
         // joints FIXED and CONTINUOUS have no limits
         if(j->type == urdf::Joint::REVOLUTE || j->type == urdf::Joint::PRISMATIC) {
-            boost::shared_ptr<urdf::JointLimits> limits = j->limits;
+            std::shared_ptr<urdf::JointLimits> limits = j->limits;
             min = std::to_string(limits->lower);
             max = std::to_string(limits->upper);
         }
@@ -330,7 +330,7 @@ bool readModelURDF(const ModelInterfaceConstPtr urdf_model,
     model.setModelVersion(1);
 
     // get root link
-    boost::shared_ptr<const urdf::Link> l_root;
+    std::shared_ptr<const urdf::Link> l_root;
     l_root = root_link_name.empty()? urdf_model->getRoot() : urdf_model->getLink(root_link_name);
 
     if(l_root!=NULL) {
