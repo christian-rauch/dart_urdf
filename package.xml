@@ -9,5 +9,9 @@
 
   <buildtool_depend>cmake</buildtool_depend>
 
-<depend>dart</depend>
+  <depend>dart</depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
 </package>
