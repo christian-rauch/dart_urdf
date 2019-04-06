@@ -9,7 +9,6 @@ add_definitions ("-Wall")
 
 ## find dependendies
 find_package(urdfdom REQUIRED)          # reading URDF models
-find_package(CUDA REQUIRED)             # CUDA types used by DART
 find_package(Boost REQUIRED filesystem) # traversing paths to find meshes
 find_package(Doxygen)
 
@@ -33,10 +32,6 @@ if(DOXYGEN_FOUND)
     COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
 endif()
-
-
-include_directories(${CUDA_INCLUDE_DIRS})
-include_directories(${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc)
 
 include_directories(${dart_INCLUDE_DIRS})
 # TODO: we need to add "dart" subdirectory because dart's header files use absolute paths
