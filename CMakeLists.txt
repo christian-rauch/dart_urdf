@@ -14,6 +14,10 @@ find_package(Doxygen)
 
 find_package(dart REQUIRED)
 
+find_package(roslib REQUIRED)
+include_directories(${roslib_INCLUDE_DIRS})
+add_definitions ("-DROS_RESOURCE")
+
 if(DOXYGEN_FOUND)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
     add_custom_target(doc
