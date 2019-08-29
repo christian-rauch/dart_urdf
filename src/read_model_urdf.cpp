@@ -240,17 +240,20 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
         // joint type
         switch(j->type) {
         case urdf::Joint::REVOLUTE:
+        case urdf::Joint::CONTINUOUS:
+        case urdf::Joint::FIXED:
+            // DART does not support unknown or fixed joints
+            // we assume these are revolute joints
             type = dart::RotationalJoint;
             break;
         case urdf::Joint::PRISMATIC:
             type = dart::PrismaticJoint;
             break;
-        case urdf::Joint::FIXED:
-        case urdf::Joint::CONTINUOUS:
-            // ignore FIXED and CONTINUOUS
+        case urdf::Joint::UNKNOWN:
+        case urdf::Joint::FLOATING:
+        case urdf::Joint::PLANAR:
+            std::cerr<<"ignoring joint '" << j->name << "' with unsupported type ("<<j->type<<")"<<std::endl;
             break;
-        default:
-            std::cerr<<"joint type ("<<j->type<<") is unsupported by DART"<<std::endl;
         }
 
         // position
@@ -274,28 +277,38 @@ bool extract_frames(const int parent_id, LinkConstPtr &link, ModelInterfaceConst
         axisY = std::to_string(axis.y);
         axisZ = std::to_string(axis.z);
 
-        // limits
-        // joints FIXED and CONTINUOUS have no limits
-        if(j->type == urdf::Joint::REVOLUTE || j->type == urdf::Joint::PRISMATIC) {
-            std::shared_ptr<urdf::JointLimits> limits = j->limits;
-            min = std::to_string(limits->lower);
-            max = std::to_string(limits->upper);
-        }
-        else {
-#ifdef PRNT_DBG
-            std::cout<<"ignoring limits of ";
-            switch(j->type) {
-            case urdf::Joint::FIXED:
-                std::cout<<"FIXED"; break;
-            case urdf::Joint::CONTINUOUS:
-                std::cout<<"CONTINUOUS"; break;
-            default:
-                std::cout<<"type "<<j->type<<std::endl;
+        // joint limits
+        switch(j->type) {
+        case urdf::Joint::REVOLUTE:
+        case urdf::Joint::PRISMATIC:
+            // joint limits are required
+            min = std::to_string(j->limits->lower);
+            max = std::to_string(j->limits->upper);
+            break;
+        case urdf::Joint::UNKNOWN:
+        case urdf::Joint::FIXED:
+            // joint limits are optional
+            if(j->limits!=nullptr) {
+                min = std::to_string(j->limits->lower);
+                max = std::to_string(j->limits->upper);
             }
-            std::cout<<" joint: "<<name<<std::endl;
-#endif
+            else {
+                min = "0";
+                max = "0";
+            }
+            break;
+        case urdf::Joint::CONTINUOUS:
+            // continous movement without limits
+            // we can not set infinite bounds, use mutiples of full rotations
+            min = std::to_string(0);
+            max = std::to_string(4*M_PI);
+            break;
+        case urdf::Joint::FLOATING:
+        case urdf::Joint::PLANAR:
             min = "0";
             max = "0";
+            std::cerr<<"ignoring limits of joint '" << j->name << "' (type: "<<j->type<<")"<<std::endl;
+            break;
         }
 
         // add frame with attributes
