@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
-project(dart_urdf)
+project(dart_urdf VERSION 0.1)
 
 # enable C++ 11
 add_definitions(-std=c++11)
